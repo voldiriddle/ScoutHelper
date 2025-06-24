@@ -3,5 +3,19 @@
 - Automate the process of adding/maybe editing another Option via the programm
 
 - Transfer the whole programm to a good-looking tkinter GUI
-- Add count for all Objects added
-- Add a way to return (print out?, put in box with copy button) the gesamt table, so they dont have to check the .db file
+
+
+
+
+
+
+
+
+
+
+
+
+DONE:
+    - Add count for all Objects added --> DB
+    - Add a way to return (print out?, put in box with copy button) the gesamt table, so they dont have to check the .db file
+    - Sort the data? Alphabetically? GROUP BY? By amount?

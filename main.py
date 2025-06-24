@@ -24,6 +24,7 @@ class App:
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Gigajurte (mat TEXT, anzahl INTEGER)''')
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS HochkohteGroß (mat TEXT, anzahl INTEGER)''')
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Gesamt (mat TEXT, anzahl INTEGER)''')
+        self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Alle (name TEXT UNIQUE, anzahl INTEGER)''')
 
         self.conn.commit()
 
@@ -117,6 +118,7 @@ class App:
             else:
                 self.cursor.execute("INSERT INTO Gesamt (mat, anzahl) VALUES (?, ?)", (mat, anzahl))
 
+        self.cursor.execute("INSERT INTO Alle (name, anzahl) VALUES (?, ?) ON CONFLICT(name) DO UPDATE SET anzahl = anzahl + 1", (obj, 1))
         self.conn.commit()
         print(f"Added materials from {obj} to Gesamt.")
 
@@ -128,16 +130,38 @@ class App:
             print("What do you want to add? ")
             for i in range(len(self.options)):
                 print(f'Enter {i+1} to add a {self.options[i]}')
+            print("Enter 'Exit' to checkout")
 
             x = input("Enter here : ")
-            print(self.options[int(x)-1])
-            self.add_to_total(self.options[int(x)-1])
-
-            if input("Do you want to add more? (y/n)").lower() == 'n':
+            if x.lower() == 'exit' or x.lower() == 'e':
                 running = False
+                self.return_data_mats()
+            elif int(x) > len(self.options)+1:
+                print("Error, please enter a valid number")
+                running = False
+                self.command_loop()
+
+            else:
+                print(self.options[int(x)-1])
+                self.add_to_total(self.options[int(x)-1])
+
+            self.return_data_obj()
 
 
 
+    def return_data_mats(self):
+        self.execute_command('SELECT * FROM Gesamt ORDER BY mat')
+        data = self.cursor.fetchall()
 
+        for (name, anzahl) in data:
+            print(f'{name} : {anzahl}')
+
+
+    def return_data_obj(self):
+
+        self.execute_command('SELECT * FROM Alle')
+        data = self.cursor.fetchall()
+        for (name, anzahl) in data:
+            print(f'{name} : {anzahl}')
 if __name__ == '__main__':
     app = App()
