@@ -1,5 +1,5 @@
 
-- Automate self.Options to match all the available Tables in the DB
+- Automate self.Options to match all the available Tables in the DB     #used in command loop for the first time
 - Automate the process of adding/maybe editing another Option via the programm
 
 - Transfer the whole programm to a good-looking tkinter GUI
