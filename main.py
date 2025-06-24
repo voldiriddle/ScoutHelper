@@ -7,7 +7,7 @@ class App:
         self.clear_whole_db()
         self.init_sq()
         self.insert_essential_data()
-        self.options = ['Kohte', 'SKohte', 'Jurtelang', 'Jurtekurz', 'Großjurte', 'Gigajurte', 'HochkohteGroß'] #Automatation later pls
+        self.options = ['Kohte', 'SKohte', 'Jurtelang', 'Jurtekurz', 'Großjurte', 'Gigajurte', 'HochkohteGroß', 'Hochkohteklein'] #Automatation later pls
         self.command_loop()
         
 
@@ -23,6 +23,7 @@ class App:
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Großjurte (mat TEXT, anzahl INTEGER)''')
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Gigajurte (mat TEXT, anzahl INTEGER)''')
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS HochkohteGroß (mat TEXT, anzahl INTEGER)''')
+        self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Hochkohteklein (mat TEXT, anzahl INTEGER)''')
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Gesamt (mat TEXT, anzahl INTEGER)''')
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Alle (name TEXT UNIQUE, anzahl INTEGER)''')
 
@@ -97,8 +98,17 @@ class App:
         self.execute_command('INSERT INTO HochkohteGroß (mat, anzahl) VALUES ("Kohtenabdeckplane", 1)')
         self.execute_command('INSERT INTO HochkohteGroß (mat, anzahl) VALUES ("Kohtenkreuzstange", 2)')
 
+        self.execute_command('INSERT INTO Hochkohteklein (mat, anzahl) VALUES ("Kohtenplane", 4)')
+        self.execute_command('INSERT INTO Hochkohteklein(mat, anzahl) VALUES ("Seitenplane 2M doppelt", 8)')
+        self.execute_command('INSERT INTO Hochkohteklein(mat, anzahl) VALUES ("Lange Seile", 3)')
+        self.execute_command('INSERT INTO Hochkohteklein(mat, anzahl) VALUES ("Seitenstange 2M", 8)')
+        self.execute_command('INSERT INTO Hochkohteklein(mat, anzahl) VALUES ("Heringe", 8)')
+        self.execute_command('INSERT INTO Hochkohteklein(mat, anzahl) VALUES ("Tampen", 8)')
+        self.execute_command('INSERT INTO Hochkohteklein(mat, anzahl) VALUES ("Kohtenabdeckplane", 1)')
+        self.execute_command('INSERT INTO Hochkohteklein(mat, anzahl) VALUES ("Kohtenkreuzstange", 2)')
+
     def add_to_total(self, obj):
-        if obj not in ['Kohte', 'SKohte', 'Jurtelang', 'Jurtekurz', 'Großjurte', 'Gigajurte', 'HochkohteGroß']:
+        if obj not in self.options:
             print('Object not valid')
             return
 
