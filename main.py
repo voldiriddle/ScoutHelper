@@ -1,15 +1,35 @@
 import sqlite3
+import customtkinter as ctk
 
+class App(ctk.CTk):
 
-class App:
     def __init__(self):
+        super().__init__()
+        self.geometry("680x580")
+        self.title("Materialplaner")
+
+
+        self.options = ['Kohte', 'SKohte', 'Jurtelang', 'Jurtekurz', 'Großjurte', 'Gigajurte', 'HochkohteGroß', 'Hochkohteklein']
         self.init_sq()
         self.clear_whole_db()
         self.init_sq()
         self.insert_essential_data()
-        self.options = ['Kohte', 'SKohte', 'Jurtelang', 'Jurtekurz', 'Großjurte', 'Gigajurte', 'HochkohteGroß', 'Hochkohteklein'] #Automatation later pls
-        self.command_loop()
-        
+        self.createGUI()
+
+
+    def createGUI(self):
+        self.optionmenu = ctk.CTkOptionMenu(self, values=self.options)
+        self.optionmenu.set(self.options[0])
+        self.optionmenu.grid(row=0, column=0, pady=10)
+
+        self.buttonADD = ctk.CTkButton(self, text="ADD to List", command=self.add_to_total)
+        self.buttonADD.grid(row=0, column=1, pady=10)
+
+        self.textMats = ctk.CTkTextbox(self, width=300, height=500)
+        self.textMats.grid(row=1, column=0, padx=20, pady=10)
+
+        self.textobj = ctk.CTkTextbox(self, width=300, height=500)
+        self.textobj.grid(row=1, column=1, padx=20, pady=10)
 
 
     def init_sq(self):
@@ -26,22 +46,6 @@ class App:
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Hochkohteklein (mat TEXT, anzahl INTEGER)''')
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Gesamt (mat TEXT, anzahl INTEGER)''')
         self.cursor.execute(''' CREATE TABLE IF NOT EXISTS Alle (name TEXT UNIQUE, anzahl INTEGER)''')
-
-        self.conn.commit()
-
-    def execute_command(self, text):
-        #text = "'''" + text + "'''"
-        print(text)
-        self.cursor.execute(text)
-        self.conn.commit()
-
-    def clear_whole_db(self):
-        self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = self.cursor.fetchall()
-        for table in tables:
-            self.cursor.execute(f'DROP TABLE IF EXISTS {table[0]}')
-        self.conn.commit()
-
 
     def insert_essential_data(self):
         self.execute_command('INSERT INTO Kohte (mat, anzahl) VALUES ("Kohtenplane", 4)')
@@ -107,9 +111,25 @@ class App:
         self.execute_command('INSERT INTO Hochkohteklein(mat, anzahl) VALUES ("Kohtenabdeckplane", 1)')
         self.execute_command('INSERT INTO Hochkohteklein(mat, anzahl) VALUES ("Kohtenkreuzstange", 2)')
 
-    def add_to_total(self, obj):
+
+    def execute_command(self, text):
+        #text = "'''" + text + "'''"
+        print(text)
+        self.cursor.execute(text)
+        self.conn.commit()
+
+
+    def clear_whole_db(self):
+        self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = self.cursor.fetchall()
+        for table in tables:
+            self.cursor.execute(f'DROP TABLE IF EXISTS {table[0]}')
+        self.conn.commit()
+
+    def add_to_total(self):
+        obj = self.optionmenu.get()
         if obj not in self.options:
-            print('Object not valid')
+            print('Object not valid') ################################### CHANGE
             return
 
         self.cursor.execute(f"SELECT mat, anzahl FROM {obj}")
@@ -130,48 +150,34 @@ class App:
 
         self.cursor.execute("INSERT INTO Alle (name, anzahl) VALUES (?, ?) ON CONFLICT(name) DO UPDATE SET anzahl = anzahl + 1", (obj, 1))
         self.conn.commit()
-        print(f"Added materials from {obj} to Gesamt.")
+        print(f"Added materials from {obj} to Gesamt.") ##########################CHANGE
+        self.return_data_obj()
+        self.return_data_mats()
 
-
-
-    def command_loop(self):
-        running = True
-        while running:
-            print("What do you want to add? ")
-            for i in range(len(self.options)):
-                print(f'Enter {i+1} to add a {self.options[i]}')
-            print("Enter 'Exit' to checkout")
-
-            x = input("Enter here : ")
-            if x.lower() == 'exit' or x.lower() == 'e':
-                running = False
-                self.return_data_mats()
-            elif int(x) > len(self.options)+1:
-                print("Error, please enter a valid number")
-                running = False
-                self.command_loop()
-
-            else:
-                print(self.options[int(x)-1])
-                self.add_to_total(self.options[int(x)-1])
-
-            self.return_data_obj()
-
-
-
-    def return_data_mats(self):
+    def return_data_mats(self): ##############
+        self.textMats.delete("1.0", ctk.END)
         self.execute_command('SELECT * FROM Gesamt ORDER BY mat')
+
         data = self.cursor.fetchall()
 
         for (name, anzahl) in data:
+            self.textMats.insert(ctk.END, f'{name}: {anzahl}\n')
             print(f'{name} : {anzahl}')
 
 
     def return_data_obj(self):
-
+        self.textobj.delete("1.0", ctk.END)
         self.execute_command('SELECT * FROM Alle')
         data = self.cursor.fetchall()
         for (name, anzahl) in data:
+            self.textobj.insert(ctk.END, f'{name}: {anzahl}\n')
             print(f'{name} : {anzahl}')
+
+
+
+
+
+
 if __name__ == '__main__':
     app = App()
+    app.mainloop()
