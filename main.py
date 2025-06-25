@@ -1,11 +1,14 @@
 import sqlite3
 import customtkinter as ctk
+ctk.set_appearance_mode("system")
+ctk.set_default_color_theme("blue")
 
 class App(ctk.CTk):
 
     def __init__(self):
         super().__init__()
-        self.geometry("680x580")
+        #self.geometry("680x580")
+        self.geometry("640x400")
         self.title("Materialplaner")
 
 
@@ -18,18 +21,46 @@ class App(ctk.CTk):
 
 
     def createGUI(self):
-        self.optionmenu = ctk.CTkOptionMenu(self, values=self.options)
+
+        self.frameRight = ctk.CTkFrame(self, width=300, height=400)
+        self.frameRight.grid(row=0, column=1, rowspan=2)
+
+        self.frameLeft = ctk.CTkFrame(self, width=300, height=400)
+        self.frameLeft.grid(row=0, column=0, sticky="n")
+
+
+
+
+        self.textMats = ctk.CTkTextbox(self.frameRight, width=300, height=380)
+        self.textMats.grid(row=1, column=0, padx=10, pady=10)
+
+
+
+
+
+
+        self.optionmenu = ctk.CTkOptionMenu(self.frameLeft, values=self.options)
         self.optionmenu.set(self.options[0])
         self.optionmenu.grid(row=0, column=0, pady=10)
 
-        self.buttonADD = ctk.CTkButton(self, text="ADD to List", command=self.add_to_total)
+        self.buttonADD = ctk.CTkButton(self.frameLeft, text="ADD to List", command=self.add_to_total)
         self.buttonADD.grid(row=0, column=1, pady=10)
 
-        self.textMats = ctk.CTkTextbox(self, width=300, height=500)
-        self.textMats.grid(row=1, column=0, padx=20, pady=10)
+        self.textobj = ctk.CTkTextbox(self.frameLeft, width=300, height=140)
+        self.textobj.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
 
-        self.textobj = ctk.CTkTextbox(self, width=300, height=500)
-        self.textobj.grid(row=1, column=1, padx=20, pady=10)
+        self.buttonCOPY = ctk.CTkButton(self.frameLeft, text="COPY", fg_color="green", hover_color="darkgreen", width=10, command=self.copytoclipboard)
+        self.buttonCOPY.grid(row=1, column=1)
+
+
+
+    def copytoclipboard(self):
+        self.clipboard_clear()
+        self.clipboard_append(self.textMats.get("1.0", "end"))
+
+
+
+
 
 
     def init_sq(self):
@@ -114,7 +145,6 @@ class App(ctk.CTk):
 
     def execute_command(self, text):
         #text = "'''" + text + "'''"
-        print(text)
         self.cursor.execute(text)
         self.conn.commit()
 
@@ -129,7 +159,7 @@ class App(ctk.CTk):
     def add_to_total(self):
         obj = self.optionmenu.get()
         if obj not in self.options:
-            print('Object not valid') ################################### CHANGE
+
             return
 
         self.cursor.execute(f"SELECT mat, anzahl FROM {obj}")
@@ -150,11 +180,11 @@ class App(ctk.CTk):
 
         self.cursor.execute("INSERT INTO Alle (name, anzahl) VALUES (?, ?) ON CONFLICT(name) DO UPDATE SET anzahl = anzahl + 1", (obj, 1))
         self.conn.commit()
-        print(f"Added materials from {obj} to Gesamt.") ##########################CHANGE
+
         self.return_data_obj()
         self.return_data_mats()
 
-    def return_data_mats(self): ##############
+    def return_data_mats(self):
         self.textMats.delete("1.0", ctk.END)
         self.execute_command('SELECT * FROM Gesamt ORDER BY mat')
 
@@ -162,7 +192,7 @@ class App(ctk.CTk):
 
         for (name, anzahl) in data:
             self.textMats.insert(ctk.END, f'{name}: {anzahl}\n')
-            print(f'{name} : {anzahl}')
+
 
 
     def return_data_obj(self):
@@ -171,7 +201,7 @@ class App(ctk.CTk):
         data = self.cursor.fetchall()
         for (name, anzahl) in data:
             self.textobj.insert(ctk.END, f'{name}: {anzahl}\n')
-            print(f'{name} : {anzahl}')
+
 
 
 
