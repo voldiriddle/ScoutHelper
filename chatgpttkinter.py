@@ -1,6 +1,7 @@
 import sqlite3
 import tkinter as tk
 from tkinter import ttk, messagebox
+#This is Chatgpt take on Designing
 
 
 class App:
